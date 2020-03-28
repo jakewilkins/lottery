@@ -17,20 +17,20 @@ module EventProcessor
   end
 
   def meeting_participant_joined(event)
-    meeting = Meeting.find(event["id"])
+    meeting = Meeting.find(event["id"], account: event["accountId"])
 
     meeting << {id: event["participant"]["user_id"], name: event["participant"]["user_name"]}
   end
 
   def meeting_participant_left(event)
-    meeting = Meeting.find(event["id"])
+    meeting = Meeting.find(event["id"], account: event["accountId"])
     return unless meeting.alive?
 
     meeting >> {id: event["participant"]["user_id"]}
   end
 
   def meeting_ended(event)
-    meeting = Meeting.find(event["id"])
+    meeting = Meeting.find(event["id"], account: event["accountId"])
     return unless meeting.alive?
 
     meeting.cleanup

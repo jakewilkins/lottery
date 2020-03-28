@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
 class Meeting
-  KEY_PATTERN = "meeting:%<id>s"
-  NAME_KEY_PATTERN = "meeting:%<id>s:%<person>s"
-  CALLED_KEY = "meeting:%<id>s:called"
+  KEY_PATTERN = "meeting:%<account_id>s:%<id>s"
+  NAME_KEY_PATTERN = "#{KEY_PATTERN}:%<person>s"
+  CALLED_KEY = "#{KEY_PATTERN}:called"
 
-  attr_reader :id
+  attr_reader :id, :account_id
 
-  def self.find(id)
-    new(id: id)
+  def self.find(id, account:)
+    new(id: id, account: account)
   end
 
-  def initialize(id:)
+  def initialize(id:, account:)
+    @account_id = account
     @id = id
   end
 
@@ -91,15 +92,15 @@ class Meeting
   end
 
   def key
-    KEY_PATTERN % {id: id}
+    KEY_PATTERN % {id: id, account_id: account_id}
   end
 
   def person_key(person_id)
-    NAME_KEY_PATTERN % {id: id, person: person_id}
+    NAME_KEY_PATTERN % {id: id, person: person_id, account_id: account_id}
   end
 
   def called_on_key
-    CALLED_KEY % {id: id}
+    CALLED_KEY % {id: id, account_id: account_id}
   end
 
 end

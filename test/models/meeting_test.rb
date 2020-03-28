@@ -3,7 +3,7 @@ require_relative "../test_helper"
 class MeetingTest < Minitest::Test
   def setup
     @redis = DB.pool.checkout
-    @meeting = Meeting.new(id: :test)
+    @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
   end
 
@@ -15,24 +15,24 @@ class MeetingTest < Minitest::Test
   def test_wedges_add_person_to_meeting
     @meeting << {id: :foo, name: :bar}
 
-    assert_equal "set", @redis.type("meeting:test")
-    assert_equal "bar", @redis.get("meeting:test:foo")
+    assert_equal "set", @redis.type("meeting:account:test")
+    assert_equal "bar", @redis.get("meeting:account:test:foo")
   end
 
   def test_other_wedges_removes_person_from_meeting
     @meeting << {id: :foo, name: :bar}
 
     @meeting >> {id: :foo}
-    assert_equal "none", @redis.type("meeting:test")
-    assert_nil @redis.get("meeting:test:foo")
+    assert_equal "none", @redis.type("meeting:account:test")
+    assert_nil @redis.get("meeting:account:test:foo")
   end
 
   def test_shared_adds_to_called_on_list
-    assert_equal "none", @redis.type("meeting:test:called")
+    assert_equal "none", @redis.type("meeting:account:test:called")
     @meeting << {id: :foo, name: :bar}
     @meeting.shared(person: :foo)
 
-    assert_equal "set", @redis.type("meeting:test:called")
+    assert_equal "set", @redis.type("meeting:account:test:called")
   end
 
   def test_draw
@@ -62,10 +62,10 @@ class MeetingTest < Minitest::Test
   def test_clear_shared
     @meeting.shared(person: :foo)
 
-    assert_equal "set", @redis.type("meeting:test:called")
+    assert_equal "set", @redis.type("meeting:account:test:called")
 
     @meeting.clear_shared
 
-    assert_equal "none", @redis.type("meeting:test:called")
+    assert_equal "none", @redis.type("meeting:account:test:called")
   end
 end

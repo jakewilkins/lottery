@@ -13,14 +13,14 @@ module CommandProcessor
     return Response.blank unless COMMANDS.include?(command)
     Settings.log([command, args])
 
-    return drawn_response(args.first) if command == :draw
+    return drawn_response(args.first, account: event["accountId"]) if command == :draw
 
     Response.blank
   end
 
-  def drawn_response(meeting_id)
+  def drawn_response(meeting_id, account:)
     id = meeting_id.gsub(/([[:punct:]]| )/, '')
-    meeting = Meeting.find(id)
+    meeting = Meeting.find(id, account: account)
 
     return Response.unknown_meeting_id(meeting_id) unless meeting.alive?
 
