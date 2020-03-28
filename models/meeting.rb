@@ -29,14 +29,32 @@ class Meeting
     end
   end
 
+  def shared(person:)
+    candidate_called_on(person)
+  end
+
   def draw
+    if everyone_has_shared?
+      return Person.new(meeting_id: id, id: :empty, name: "Everyone has shared!")
+    end
+
+    tries = 0
     begin
       candidate = draw_candidate
-    end until candidate_available?(candidate)
+      tries += 1
+    end until candidate_available?(candidate) || tries > 10
 
-    candidate_called_on(candidate)
+    name = DB { |conn| conn.get(person_key(candidate)) }
 
-    DB { |conn| conn.get(person_key(candidate)) }
+    Person.new(
+      meeting_id: id,
+      id: candidate,
+      name: name
+    )
+  end
+
+  def clear_shared
+    DB { |conn| conn.del(called_on_key) }
   end
 
   def cleanup
@@ -63,7 +81,13 @@ class Meeting
   end
 
   def candidate_available?(id)
-    DB { |conn| conn.sismember(called_on_key, id) }
+    !DB { |conn| conn.sismember(called_on_key, id) }
+  end
+
+  def everyone_has_shared?
+    DB { |conn|
+      conn.scard(called_on_key) == conn.scard(key)
+    }
   end
 
   def key

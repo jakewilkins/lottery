@@ -23,6 +23,38 @@ module Settings
     ENV["ZOOM_VERIFICATION_TOKEN"]
   end
 
+  def chatbot_client_id
+    ENV["ZOOM_CLIENT_ID"]
+  end
+
+  def chatbot_client_secret
+    ENV["ZOOM_CLIENT_SECRET"]
+  end
+
+  def root_path
+    @root_path ||= Pathname.new(__FILE__).dirname
+  end
+
+  def template_path(template)
+    template = "#{template}.yaml.erb" unless template.include?(".")
+    root_path.join("templates").join(template)
+  end
+
+  def get_template(name)
+    return template if (template = template_cache[name])
+
+    winner_template = template_path(name)
+    template = ERB.new(winner_template.read)
+
+    template_cache[name] = template unless debug?
+
+    template
+  end
+
+  def template_cache
+    @template_cache ||= {}
+  end
+
   def debug?
     ENV.key?("DEBUG")
   end
