@@ -1,0 +1,23 @@
+---
+robot_jid: <%= robot_jid %>
+to_jid: <%= to_jid %>
+account_id: <%= account_id %>
+content:
+  header:
+    text: "<%= header %>"
+  body:
+    - type: "section"
+      sections:
+        - type: "message"
+          text: "<%= message %>"
+        - type: "actions"
+          items:
+            - text: "Draw again"
+              value: "draw-again:<%= meeting_id %>"
+              style: "Primary"
+            <% if defined?(show_clear) && show_clear %>
+            - text: "Reset previously shared"
+              value: "reset-shared:<%= meeting_id %>"
+              style: "Danger"
+            <% end %>
+  footer: "Yikes!"

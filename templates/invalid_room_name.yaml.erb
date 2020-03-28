@@ -1,0 +1,20 @@
+---
+robot_jid: <%= robot_jid %>
+to_jid: <%= to_jid %>
+account_id: <%= account_id %>
+content:
+  header:
+    text: "Meeting ID not found"
+  body:
+    - type: "section"
+      sections:
+        - type: "message"
+          text: "I didn't find a meeting with the ID you passed: <%= meeting_id %>"
+        - type: "message"
+          text: "Possible I don't have access to that account?"
+        - type: "actions"
+          items:
+            - text: "I'm sorry"
+              value: "im-sorry:<%= meeting_id %>"
+              style: "Primary"
+  footer: "Yikes!"
