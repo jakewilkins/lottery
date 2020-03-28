@@ -27,7 +27,7 @@ module CommandProcessor
     winner = meeting.draw
 
     if winner.empty?
-      Response.empty_draw(meeting)
+      Response.empty_draw(meeting.id)
     else
       Response.winner(winner)
     end
