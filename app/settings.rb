@@ -32,7 +32,7 @@ module Settings
   end
 
   def root_path
-    @root_path ||= Pathname.new(__FILE__).dirname
+    @root_path ||= Pathname.new(__FILE__).dirname.dirname
   end
 
   def template_path(template)
