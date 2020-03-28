@@ -1,17 +1,6 @@
 # frozen_string_literal: true
 
 module CommandProcessor
-  class Response
-
-    def as_json
-      # build the JSON markup for the response
-    end
-
-    def sendable
-      false # obvs shouldn't be hardcoded
-    end
-  end
-
   COMMANDS = %i|
     draw
     help
@@ -20,10 +9,34 @@ module CommandProcessor
   module_function
 
   def call(event)
-    return unless COMMANDS.include?(event["cmd"])
+    command, args = parse_command(event["cmd"])
+    return Response.blank unless COMMANDS.include?(command)
+    p command, args
 
-    # Process the command and return a response object
+    return drawn_response(args.first) if command == :draw
 
-    Response.new
+    Response.blank
+  end
+
+  def drawn_response(meeting_id)
+    id = meeting_id.gsub(/([[:punct:]]| )/, '')
+    meeting = Meeting.find(id)
+
+    return Response.unknown_meeting_id(meeting_id) unless meeting.alive?
+
+    winner = meeting.draw
+
+    if winner.empty?
+      Response.empty_draw(meeting)
+    else
+      Response.winner(winner)
+    end
+  end
+
+  def parse_command(cmd)
+    command, args = cmd.split(" ", 2)
+    command = command.downcase.intern
+
+    [command, args.split(" ")]
   end
 end

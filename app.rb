@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "setup"
-
 class App < Sinatra::Base
   get "/oauth" do
     redirect "https://zoom.us/launch/chat?jid=robot_#{Settings.zoom_bot_jid}"
@@ -23,14 +21,21 @@ class App < Sinatra::Base
 
     body = JSON.parse(request.body.read) rescue {}
     Settings.log body
+    payload = body["payload"]
 
-    # Is the command processor going to handle button actions too or do I filter
-    # that here into and handle it in a separate module
-    response = CommandProcessor.call(body)
+    response = case body["event"]
+    when "bot_notification"
+      CommandProcessor.call(payload)
+    when "interactive_message_actions"
+      InteractionProcessor.call(payload)
+    else
+      Response.blank
+    end
+
     Settings.log response
 
     if response.sendable?
-      Zoom.send_message(response)
+      Zoom.send_message(body, response)
     end
 
     "ok"
