@@ -13,10 +13,10 @@ module Zoom
     json_hash = response.as_json(additional_context)
 
     if response.message_id
-      puts "updating message #{response.message_id}\n#{json_hash}"
+      Settings.log "updating message #{response.message_id}\n#{json_hash}"
       put "im/chat/messages/#{response.message_id}", json_hash
     else
-      puts "sending: #{json_hash}"
+      Settings.log "sending: #{json_hash}"
       post "im/chat/messages", json_hash
     end
   end
