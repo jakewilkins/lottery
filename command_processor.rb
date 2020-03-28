@@ -11,7 +11,7 @@ module CommandProcessor
   def call(event)
     command, args = parse_command(event["cmd"])
     return Response.blank unless COMMANDS.include?(command)
-    p command, args
+    Settings.log([command, args])
 
     return drawn_response(args.first) if command == :draw
 
