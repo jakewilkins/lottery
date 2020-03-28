@@ -27,8 +27,11 @@ class CommandProcessorTest < Minitest::Test
     assert_instance_of Person, response.context[:person]
 
     @meeting.shared(person: "foo")
-
     response = @subject.drawn_response("test", account: :account)
     assert_equal :empty_draw, response.type
+
+
+    response = @subject.drawn_response("test", account: :other_account)
+    assert_equal :unknown_meeting_id, response.type
   end
 end
