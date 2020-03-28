@@ -1,8 +1,32 @@
 # frozen_string_literal: true
 
 class Response
-  attr_reader :type, :context
-  attr_accessor :message_id
+  RESPONSES = {
+    winner: { template: "winner" },
+    person_sharing: {
+      template: "redraw_with_message",
+      values: {
+        header: "Awesome!",
+        message: "I hope they stay on topic!"
+      }
+    },
+    sharing_reset: {
+      template: "redraw_with_message",
+      values: {
+        header: "Nice",
+        message: "The already shared list has been cleared.",
+      }
+    },
+    empty_draw: {
+      template: "redraw_with_message",
+      values: {
+        header: "Wow!",
+        message: "Couldn't find anyone who hasn't shared, that might be everyone!",
+        show_clear: true
+      }
+    },
+    unknown_meeting_id: { template: "invalid_room_name" }
+  }
 
   def self.winner(person)
     new(type: :winner, context: {person: person})
@@ -20,13 +44,16 @@ class Response
     new(type: :sharing_reset, context: {meeting_id: id})
   end
 
-  def self.empty_draw(meeting)
-    new(type: :empty_draw, context: {meeting_id: meeting.id})
+  def self.empty_draw(id)
+    new(type: :empty_draw, context: {meeting_id: id})
   end
 
   def self.blank
     new(type: :blank)
   end
+
+  attr_reader :type, :context
+  attr_accessor :message_id
 
   def initialize(type:, context: {})
     @type = type
@@ -34,9 +61,7 @@ class Response
   end
 
   def as_json(additional_context)
-    # build the JSON markup for the response
-    yaml = send(:"build_#{type}", additional_context)
-    YAML.load(yaml)
+    YAML.load(build_yaml(additional_context))
   end
 
   def sendable?
@@ -45,55 +70,12 @@ class Response
 
   private
 
-  def build_winner(additional_context)
-    template = Settings.get_template("winner")
-    build_context = context.dup.merge(additional_context)
+  def build_yaml(additional_context)
+    conf = RESPONSES.fetch(type)
+    values = conf.fetch(:values, {})
 
-
-    template.result_with_hash(build_context)
-  end
-
-  def build_person_sharing(additional_context)
-    template = Settings.get_template("redraw_with_message")
-    build_context = context.dup.merge(additional_context)
-    build_context = build_context.merge({
-      header: "Awesome!",
-      message: "I hope they stay on topic!"
-    })
-
-
-    template.result_with_hash(build_context)
-  end
-
-  def build_sharing_reset(additional_context)
-    template = Settings.get_template("redraw_with_message")
-    build_context = context.dup.merge(additional_context)
-    build_context = build_context.merge({
-      header: "Nice",
-      message: "The already shared list has been cleared.",
-    })
-
-
-    template.result_with_hash(build_context)
-  end
-
-  def build_empty_draw(additional_context)
-    template = Settings.get_template("redraw_with_message")
-    build_context = context.dup.merge(additional_context)
-    build_context = build_context.merge({
-      header: "Wow!",
-      message: "Couldn't find anyone who hasn't shared, that might be everyone!",
-      show_clear: true
-    })
-
-
-    template.result_with_hash(build_context)
-  end
-
-  def build_unknown_meeting_id(additional_context)
-    template = Settings.get_template("invalid_room_name")
-    build_context = context.dup.merge(additional_context)
-
+    template = Settings.get_template(conf[:template])
+    build_context = context.dup.merge(additional_context).merge(values)
 
     template.result_with_hash(build_context)
   end
