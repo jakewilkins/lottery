@@ -5,6 +5,10 @@ class App < Sinatra::Base
     redirect "https://zoom.us/launch/chat?jid=robot_#{Settings.zoom_bot_jid}"
   end
 
+  get "/verifyzoom.html" do
+    Settings.verifyzoom.read
+  end
+
   post "/hook" do
     return halt(403) unless valid_request?
 

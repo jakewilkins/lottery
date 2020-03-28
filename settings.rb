@@ -55,6 +55,10 @@ module Settings
     @template_cache ||= {}
   end
 
+  def verifyzoom
+    root_path.join("verifyzoom.html")
+  end
+
   def debug?
     ENV.key?("DEBUG")
   end
