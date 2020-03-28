@@ -23,7 +23,13 @@ class ResponseTest < Minitest::Test
     response = Response.winner(person)
 
     assert_equal :winner, response.type
-    assert_instance_of Hash, response.as_json(additional_context)
+    json = response.as_json(additional_context)
+    assert_instance_of Hash, json
+    sharing_action = json.dig("content", "body", 0, "sections", 1, "items", 0, "value")
+    assert_equal "mark-sharing:account.test.foo", sharing_action
+
+    draw_again_action = json.dig("content", "body", 0, "sections", 1, "items", 1, "value")
+    assert_equal "draw-again:account.test", draw_again_action
   end
 
   def test_unknown_meeting_id
@@ -39,7 +45,13 @@ class ResponseTest < Minitest::Test
 
     assert response.sendable?
     assert_equal :person_sharing, response.type
-    assert_instance_of Hash, response.as_json(additional_context)
+
+    json = response.as_json(additional_context)
+    assert_instance_of Hash, json
+    draw_again_action = json.dig("content", "body", 0, "sections", 1, "items", 0, "value")
+    assert_equal "draw-again:account.foo", draw_again_action
+    reset_shared_action = json.dig("content", "body", 0, "sections", 1, "items", 1)
+    assert_nil reset_shared_action
   end
 
   def test_sharing_reset
@@ -47,7 +59,11 @@ class ResponseTest < Minitest::Test
 
     assert response.sendable?
     assert_equal :sharing_reset, response.type
-    assert_instance_of Hash, response.as_json(additional_context)
+
+    json = response.as_json(additional_context)
+    assert_instance_of Hash, json
+    draw_again_action = json.dig("content", "body", 0, "sections", 1, "items", 0, "value")
+    assert_equal "draw-again:account.foo", draw_again_action
   end
 
   def test_empty_draw
@@ -55,7 +71,12 @@ class ResponseTest < Minitest::Test
 
     assert response.sendable?
     assert_equal :empty_draw, response.type
-    assert_instance_of Hash, response.as_json(additional_context)
+    json = response.as_json(additional_context)
+    assert_instance_of Hash, json
+    draw_again_action = json.dig("content", "body", 0, "sections", 1, "items", 0, "value")
+    assert_equal "draw-again:account.foo", draw_again_action
+    reset_shared_action = json.dig("content", "body", 0, "sections", 1, "items", 1, "value")
+    assert_equal "reset-shared:account.foo", reset_shared_action
   end
 
   def test_blank
