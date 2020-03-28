@@ -41,7 +41,9 @@ module Settings
   end
 
   def get_template(name)
-    return template if (template = template_cache[name])
+    if (template = template_cache[name])
+      return template
+    end
 
     winner_template = template_path(name)
     template = ERB.new(winner_template.read)
