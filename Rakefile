@@ -12,9 +12,15 @@ task :push_env do
   require "dotenv"
   Dotenv.load
 
-  settings = %w(ZOOM_CLIENT_ID_PROD ZOOM_CLIENT_SECRET_PROD ZOOM_BOT_JID_PROD ZOOM_VERIFICATION_TOKEN).each_with_object("") do |key, out|
-    raise "Config not set: #{key}" unless ENV.has_key?(key)
-    out << " #{key}=#{ENV[key]}"
+  suffix = ""
+  unless ENV["ENV"] == "dev"
+    suffix = "_PROD"
+  end
+
+  settings = %w(ZOOM_CLIENT_ID ZOOM_CLIENT_SECRET ZOOM_BOT_JID ZOOM_VERIFICATION_TOKEN).each_with_object("") do |key, out|
+    set = "#{key}#{suffix}"
+    raise "Config not set: #{set}" unless ENV.has_key?(set)
+    out << " #{set}=#{ENV[set]}"
   end
 
   system("heroku config:set --app llotto #{settings}")
