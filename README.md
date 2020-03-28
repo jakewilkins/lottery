@@ -2,6 +2,10 @@
 
 Lottery share system for a Zoom meeting
 
+## Demo
+
+![demo gif](demo.gif)
+
 ## Developing
 
 All of this is TODO
