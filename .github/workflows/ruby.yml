@@ -18,7 +18,7 @@ jobs:
       with:
         ruby-version: 2.6.x
     - name: Start Redis
-      uses: superchargejs/redis-github-action@v1
+      uses: superchargejs/redis-github-action@v1.1.0
       with:
         redis-version: 5
     - name: Build and test with Rake
