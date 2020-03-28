@@ -13,11 +13,11 @@ content:
         - type: "actions"
           items:
             - text: "Draw again"
-              value: "draw-again:<%= meeting_id %>"
+              value: "draw-again:<%= account_id %>.<%= meeting_id %>"
               style: "Primary"
             <% if defined?(show_clear) && show_clear %>
             - text: "Reset previously shared"
-              value: "reset-shared:<%= meeting_id %>"
+              value: "reset-shared:<%= account_id %>.<%= meeting_id %>"
               style: "Danger"
             <% end %>
   footer: "Yikes!"

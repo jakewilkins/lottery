@@ -13,9 +13,9 @@ content:
         - type: "actions"
           items:
             - text: "They started sharing"
-              value: "mark-sharing:<%= person.meeting_id %>.<%= person.id %>"
+              value: "mark-sharing:<%= account_id %>.<%= person.meeting_id %>.<%= person.id %>"
               style: 'Primary'
             - text: "Draw again"
-              value: "draw-again:<%= person.meeting_id %>"
+              value: "draw-again:<%= account_id %>.<%= person.meeting_id %>"
               style: "Danger"
   footer: "Winner winner chicken dinner!"
