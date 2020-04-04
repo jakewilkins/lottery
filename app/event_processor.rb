@@ -13,18 +13,22 @@ module EventProcessor
 
     method = event["event"].gsub(".", "_").intern
 
-    public_send(method, event["payload"]["object"])
+    public_send(method, event["payload"])
   end
 
   def meeting_participant_joined(event)
-    meeting = Meeting.find(event["id"], account: event["accountId"])
+    account_id = event["accountId"]
+    event = event["object"]
+    meeting = Meeting.find(event["id"], account: account_id)
     person = Person.get(id: event["participant"]["user_id"], name: event["participant"]["user_name"])
 
     meeting << person
   end
 
   def meeting_participant_left(event)
-    meeting = Meeting.find(event["id"], account: event["accountId"])
+    account_id = event["accountId"]
+    event = event["object"]
+    meeting = Meeting.find(event["id"], account: account_id)
     return unless meeting.alive?
 
     person = Person.find(id: event["participant"]["user_id"])
@@ -33,7 +37,9 @@ module EventProcessor
   end
 
   def meeting_ended(event)
-    meeting = Meeting.find(event["id"], account: event["accountId"])
+    account_id = event["accountId"]
+    event = event["object"]
+    meeting = Meeting.find(event["id"], account: account_id)
     return unless meeting.alive?
 
     meeting.cleanup
