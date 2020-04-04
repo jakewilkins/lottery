@@ -25,3 +25,5 @@ task :push_env do
 
   system("heroku config:set --app llotto #{settings}")
 end
+
+task default: :test
