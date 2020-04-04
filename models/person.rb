@@ -48,6 +48,20 @@ class Person
     end
   end
 
+  def joined_at_time(for_meeting_id = nil)
+    for_meeting_id ||= meeting_id
+
+    raise "must supply a meeting id to get a joined at time" unless for_meeting_id
+
+    time = @joined_times[meeting_id]
+
+    raise "This person isn't in this meeting ?!?!" unless time
+
+    time = Time.iso8601(time)
+
+    time.strftime("%l:%M %P")
+  end
+
   def save
     DB { |conn| conn.set(key, name) }
   end

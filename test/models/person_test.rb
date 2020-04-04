@@ -51,4 +51,13 @@ class PersonTest < Minitest::Test
     person = Person.find(id: @person.id)
     assert_equal time, person.joined_times[@meeting.id.to_s]
   end
+
+  def test_joined_at_time
+    time = Time.iso8601("2020-04-04T15:48:32-07:00")
+    @person.participating_in(meeting_id: @meeting.id, joined_at: time.iso8601)
+
+    @person.meeting_id = @meeting.id
+
+    assert_equal " 3:48 pm", @person.joined_at_time
+  end
 end
