@@ -17,16 +17,17 @@ class ResponseTest < Minitest::Test
   end
 
   def test_winner
+    @meeting << @person
     @person.meeting_id = :test
     response = Response.winner(@person)
 
     assert_equal :winner, response.type
     json = response.as_json(additional_context)
     assert_instance_of Hash, json
-    sharing_action = json.dig("content", "body", 0, "sections", 1, "items", 0, "value")
+    sharing_action = json.dig("content", "body", 0, "sections", 2, "items", 0, "value")
     assert_equal "mark-sharing:account.test.foo", sharing_action
 
-    draw_again_action = json.dig("content", "body", 0, "sections", 1, "items", 1, "value")
+    draw_again_action = json.dig("content", "body", 0, "sections", 2, "items", 1, "value")
     assert_equal "draw-again:account.test", draw_again_action
   end
 
