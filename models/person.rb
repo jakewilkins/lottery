@@ -18,17 +18,20 @@ class Person
 
   attr_reader :meeting_id, :id, :name
   attr_writer :meeting_id
+  attr_reader :joined_times
 
   def initialize(id:, name: nil, meeting_id: nil)
     @meeting_id, @id, @name = meeting_id, id, name
+    @joined_times = {}
   end
 
-  def participating_in(meeting_id:)
+  def participating_in(meeting_id:, joined_at: nil)
     DB do |conn|
       if !conn.exists(key)
         save
       end
-      conn.hset(active_meetings_key, meeting_id, now)
+      @joined_times[meeting_id] = joined_at || now
+      conn.hset(active_meetings_key, meeting_id, @joined_times[meeting_id])
     end
   end
 
@@ -52,6 +55,7 @@ class Person
   def hydrate
     DB do |conn|
       @name = conn.get(key)
+      @joined_times = conn.hgetall(active_meetings_key)
     end
   end
 

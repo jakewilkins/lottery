@@ -43,4 +43,12 @@ class PersonTest < Minitest::Test
 
     refute_includes @redis.hkeys(@person.active_meetings_key), @meeting.id.to_s
   end
+
+  def test_tracks_joined_times_for_meetings
+    time = Time.now.iso8601
+    @person.participating_in(meeting_id: @meeting.id, joined_at: time)
+
+    person = Person.find(id: @person.id)
+    assert_equal time, person.joined_times[@meeting.id.to_s]
+  end
 end
