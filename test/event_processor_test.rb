@@ -8,6 +8,8 @@ class EventProcessorTest < Minitest::Test
     @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
 
+    @person = Person.new(id: :bar, name: :bap)
+
     @redis = DB.pool.checkout
     @subject = EventProcessor
   end
@@ -28,13 +30,13 @@ class EventProcessorTest < Minitest::Test
     }
 
     @subject.meeting_participant_joined(event)
-    assert_equal "set", @redis.type("meeting:account:test")
-    assert_equal "bap", @redis.get("meeting:account:test:bar")
+    assert_equal "set", @redis.type(@meeting.key)
+    assert_equal "bap", Person.find(id: @person.id).name
   end
 
   def test_meeting_participant_ended
     @meeting.cleanup
-    @meeting << {id: :bar, name: :bar}
+    @meeting << @person
     event = {
       "id" => "test",
       "accountId" => "account",
@@ -46,13 +48,13 @@ class EventProcessorTest < Minitest::Test
 
     @subject.meeting_participant_left(event)
 
-    assert_equal "none", @redis.type("meeting:account:test")
-    assert_nil @redis.get("meeting:account:test:foo")
+    assert_equal "none", @redis.type(@meeting.key)
+    assert_nil Person.find(id: @person.id).name
   end
 
   def test_meeting_ended
-    @meeting << {id: :foo, name: :bar}
-    @meeting.shared(person: :foo)
+    @meeting << @person
+    @meeting.shared(@person)
     event = {
       "id" => "test",
       "accountId" => "account",
@@ -64,8 +66,8 @@ class EventProcessorTest < Minitest::Test
 
     @subject.meeting_ended(event)
 
-    assert_equal "none", @redis.type("meeting:account:test")
-    assert_equal "none", @redis.type("meeting:account:test:called")
-    assert_nil @redis.get("meeting:account:test:foo")
+    assert_equal "none", @redis.type(@meeting.key)
+    assert_equal "none", @redis.type(@meeting.called_on_key)
+    assert_nil Person.find(id: @person.id).name
   end
 end

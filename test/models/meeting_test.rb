@@ -5,6 +5,7 @@ class MeetingTest < Minitest::Test
     @redis = DB.pool.checkout
     @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
+    @person = Person.new(id: :foo, name: :bar)
   end
 
   def teardown
@@ -13,26 +14,26 @@ class MeetingTest < Minitest::Test
   end
 
   def test_wedges_add_person_to_meeting
-    @meeting << {id: :foo, name: :bar}
+    @meeting << @person
 
-    assert_equal "set", @redis.type("meeting:account:test")
-    assert_equal "bar", @redis.get("meeting:account:test:foo")
+    assert_equal "set", @redis.type(@meeting.key)
+    assert_equal "bar", Person.find(id: @person.id).name
   end
 
   def test_other_wedges_removes_person_from_meeting
-    @meeting << {id: :foo, name: :bar}
+    @meeting << @person
 
-    @meeting >> {id: :foo}
-    assert_equal "none", @redis.type("meeting:account:test")
-    assert_nil @redis.get("meeting:account:test:foo")
+    @meeting >> @person
+    assert_equal "none", @redis.type(@meeting.key)
+    assert_nil Person.find(id: @person.id).name
   end
 
   def test_shared_adds_to_called_on_list
-    assert_equal "none", @redis.type("meeting:account:test:called")
-    @meeting << {id: :foo, name: :bar}
-    @meeting.shared(person: :foo)
+    assert_equal "none", @redis.type(@meeting.key)
+    @meeting << @person
+    @meeting.shared(@person)
 
-    assert_equal "set", @redis.type("meeting:account:test:called")
+    assert_equal "set", @redis.type(@meeting.key)
   end
 
   def test_draw
@@ -41,31 +42,31 @@ class MeetingTest < Minitest::Test
     assert_instance_of Person, person
     assert person.empty?
 
-    @meeting << {id: :foo, name: :bar}
+    @meeting << @person
     person = @meeting.draw
 
     # Valid sharer
     assert_equal "foo", person.id
 
     # Everyone has shared
-    @meeting.shared(person: :foo)
+    @meeting.shared(@person)
     person = @meeting.draw
     assert person.empty?
 
 
     # multiple people
-    @meeting << {id: :baz, name: :bap}
+    @meeting << Person.new(id: :baz, name: :bap)
     person = @meeting.draw
     assert_equal "baz", person.id
   end
 
   def test_clear_shared
-    @meeting.shared(person: :foo)
+    @meeting.shared(@person)
 
-    assert_equal "set", @redis.type("meeting:account:test:called")
+    assert_equal "set", @redis.type(@meeting.called_on_key)
 
     @meeting.clear_shared
 
-    assert_equal "none", @redis.type("meeting:account:test:called")
+    assert_equal "none", @redis.type(@meeting.called_on_key)
   end
 end

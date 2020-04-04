@@ -23,7 +23,8 @@ module InteractionProcessor
     meeting = Meeting.find(meeting_id, account: account_id)
     return unless meeting.alive?
 
-    meeting.shared(person: person_id)
+    person = Person.find(id: person_id)
+    meeting.shared(person)
 
     Response.person_sharing(meeting_id)
   end

@@ -18,15 +18,18 @@ module EventProcessor
 
   def meeting_participant_joined(event)
     meeting = Meeting.find(event["id"], account: event["accountId"])
+    person = Person.get(id: event["participant"]["user_id"], name: event["participant"]["user_name"])
 
-    meeting << {id: event["participant"]["user_id"], name: event["participant"]["user_name"]}
+    meeting << person
   end
 
   def meeting_participant_left(event)
     meeting = Meeting.find(event["id"], account: event["accountId"])
     return unless meeting.alive?
 
-    meeting >> {id: event["participant"]["user_id"]}
+    person = Person.find(id: event["participant"]["user_id"])
+
+    meeting >> person
   end
 
   def meeting_ended(event)

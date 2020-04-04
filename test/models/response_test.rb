@@ -7,6 +7,8 @@ class ResponseTest < Minitest::Test
     @redis = DB.pool.checkout
     @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
+
+    @person = Person.new(id: :foo, name: :bar)
   end
 
   def teardown
@@ -15,12 +17,8 @@ class ResponseTest < Minitest::Test
   end
 
   def test_winner
-    person = Person.new({
-      meeting_id: :test,
-      id: :foo,
-      name: :bar
-    })
-    response = Response.winner(person)
+    @person.meeting_id = :test
+    response = Response.winner(@person)
 
     assert_equal :winner, response.type
     json = response.as_json(additional_context)

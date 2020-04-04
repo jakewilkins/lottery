@@ -16,27 +16,28 @@ class Meeting
     @id = id
   end
 
-  def <<(id:, name:)
+  def <<(person)
     DB do |conn|
-      conn.sadd(key, id)
-      conn.set(person_key(id), name)
+      conn.sadd(key, person.id)
+      person.participating_in(meeting_id: id)
+      # conn.set(person_key(id), name)
     end
   end
 
-  def >>(id:)
+  def >>(person)
     DB do |conn|
-      conn.srem key, id
-      conn.del(person_key(id))
+      conn.srem key, person.id
+      person.cleanup(meeting_id: id)
     end
   end
 
-  def shared(person:)
-    candidate_called_on(person)
+  def shared(person)
+    candidate_called_on(person.id)
   end
 
   def draw
     if everyone_has_shared?
-      return Person.new(meeting_id: id, id: :empty, name: "Everyone has shared!")
+      return Person.empty(meeting_id: id)
     end
 
     tries = 0
@@ -45,13 +46,7 @@ class Meeting
       tries += 1
     end until candidate_available?(candidate) || tries > 10
 
-    name = DB { |conn| conn.get(person_key(candidate)) }
-
-    Person.new(
-      meeting_id: id,
-      id: candidate,
-      name: name
-    )
+    Person.find(id: candidate).tap {|e| e.meeting_id = id}
   end
 
   def clear_shared
@@ -60,8 +55,8 @@ class Meeting
 
   def cleanup
     DB { |conn|
-      person_keys = conn.keys("#{key}:*")
-      person_keys.each { |k| conn.del(k) }
+      person_keys = conn.smembers(key)
+      person_keys.each { |k| Person.new(id: k).cleanup(meeting_id: id) }
       conn.del(key)
       conn.del(called_on_key)
     }
@@ -69,6 +64,14 @@ class Meeting
 
   def alive?
     DB { |conn| conn.exists(key) }
+  end
+
+  def key
+    KEY_PATTERN % {id: id, account_id: account_id}
+  end
+
+  def called_on_key
+    CALLED_KEY % {id: id, account_id: account_id}
   end
 
   private
@@ -90,17 +93,4 @@ class Meeting
       conn.scard(called_on_key) == conn.scard(key)
     }
   end
-
-  def key
-    KEY_PATTERN % {id: id, account_id: account_id}
-  end
-
-  def person_key(person_id)
-    NAME_KEY_PATTERN % {id: id, person: person_id, account_id: account_id}
-  end
-
-  def called_on_key
-    CALLED_KEY % {id: id, account_id: account_id}
-  end
-
 end

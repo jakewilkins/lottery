@@ -7,6 +7,8 @@ class InteractionProcessorTest < Minitest::Test
     @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
 
+    @person = Person.new(id: "foo", name: "bar")
+
     @redis = DB.pool.checkout
     @subject = InteractionProcessor
   end
@@ -17,7 +19,7 @@ class InteractionProcessorTest < Minitest::Test
   end
 
   def test_mark_sharing
-    @meeting << {id: "foo", name: "bar"}
+    @meeting << @person
     event = {
       "actionItem" => {
         "value" => "mark-sharing:account.test.foo"
@@ -27,11 +29,11 @@ class InteractionProcessorTest < Minitest::Test
 
     @subject.call(event)
 
-    assert_equal "set", @redis.type("meeting:account:test:called")
+    assert_equal "set", @redis.type(@meeting.called_on_key)
   end
 
   def test_reset_sharing
-    @meeting << {id: "foo", name: "bar"}
+    @meeting << @person
     event = {
       "actionItem" => {
         "value" => "mark-sharing:account.test.foo"
@@ -41,13 +43,13 @@ class InteractionProcessorTest < Minitest::Test
 
     response = @subject.call(event)
 
-    assert_equal "set", @redis.type("meeting:account:test:called")
+    assert_equal "set", @redis.type(@meeting.called_on_key)
     assert_equal :person_sharing, response.type
   end
 
 
   def test_draw_again
-    @meeting << {id: "foo", name: "bar"}
+    @meeting << @person
     event = {
       "actionItem" => {
         "value" => "reset-shared:account.test"
@@ -57,7 +59,7 @@ class InteractionProcessorTest < Minitest::Test
 
     response = @subject.call(event)
 
-    assert_equal "none", @redis.type("meeting:account:test:called")
+    assert_equal "none", @redis.type(@meeting.called_on_key)
     assert_equal :sharing_reset, response.type
   end
 end
