@@ -21,11 +21,13 @@ class EventProcessorTest < Minitest::Test
 
   def test_meeting_participant_joined
     event = {
-      "id" => "test",
       "accountId" => "account",
-      "participant" => {
-        "user_id" => "bar",
-        "user_name" => "bap"
+      "object" => {
+        "id" => "test",
+        "participant" => {
+          "user_id" => "bar",
+          "user_name" => "bap"
+        }
       }
     }
 
@@ -38,11 +40,13 @@ class EventProcessorTest < Minitest::Test
     @meeting.cleanup
     @meeting << @person
     event = {
-      "id" => "test",
       "accountId" => "account",
-      "participant" => {
-        "user_id" => "bar",
-        "user_name" => "bap"
+      "object" => {
+        "id" => "test",
+        "participant" => {
+          "user_id" => "bar",
+          "user_name" => "bap"
+        }
       }
     }
 
@@ -56,11 +60,13 @@ class EventProcessorTest < Minitest::Test
     @meeting << @person
     @meeting.shared(@person)
     event = {
-      "id" => "test",
       "accountId" => "account",
-      "participant" => {
-        "user_id" => "bar",
-        "user_name" => "bap"
+      "object" => {
+        "id" => "test",
+        "participant" => {
+          "user_id" => "bar",
+          "user_name" => "bap"
+        }
       }
     }
 
