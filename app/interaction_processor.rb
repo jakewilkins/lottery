@@ -5,14 +5,19 @@ module InteractionProcessor
 
   def call(event)
     action, payload = event["actionItem"]["value"].split(":")
+    payload = payload.split(".")
+
+    Settings.debug do
+      puts "processing #{action} with args #{payload.inspect}"
+    end
 
     response = case action
     when "mark-sharing"
-      mark_sharing(*payload.split("."))
+      mark_sharing(*payload)
     when "draw-again"
-      draw_again(*payload.split("."))
+      draw_again(*payload)
     when "reset-shared"
-      reset_shared(*payload.split("."))
+      reset_shared(*payload)
     end
     response.message_id = event["messageId"]
 
