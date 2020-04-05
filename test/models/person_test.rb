@@ -1,7 +1,5 @@
 require_relative "../test_helper"
 
-require "timecop"
-
 class PersonTest < Minitest::Test
   def setup
     @redis = DB.pool.checkout

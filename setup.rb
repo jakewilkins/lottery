@@ -12,6 +12,7 @@ require "json"
 require "pathname"
 require "net/http"
 require "uri"
+require "meaningful_time"
 
 require_relative "app/settings"
 require_relative "app/event_processor"
