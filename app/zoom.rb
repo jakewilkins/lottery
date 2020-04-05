@@ -33,7 +33,14 @@ module Zoom
     when Net::HTTPSuccess
       :ok
     else
-      require "pry"; binding.pry
+      Settings.debug do
+        puts response.class
+        puts response.body
+
+        if ENV["DEBUG"] == 2
+          require "pry"; binding.pry
+        end
+      end
     end
   end
 
