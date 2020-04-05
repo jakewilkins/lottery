@@ -21,7 +21,7 @@ class EventProcessorTest < Minitest::Test
 
   def test_meeting_participant_joined
     event = {
-      "accountId" => "account",
+      "account_id" => "account",
       "object" => {
         "id" => "test",
         "participant" => {
@@ -40,7 +40,7 @@ class EventProcessorTest < Minitest::Test
     @meeting.cleanup
     @meeting << @person
     event = {
-      "accountId" => "account",
+      "account_id" => "account",
       "object" => {
         "id" => "test",
         "participant" => {
@@ -60,7 +60,7 @@ class EventProcessorTest < Minitest::Test
     @meeting << @person
     @meeting.shared(@person)
     event = {
-      "accountId" => "account",
+      "account_id" => "account",
       "object" => {
         "id" => "test",
         "participant" => {
