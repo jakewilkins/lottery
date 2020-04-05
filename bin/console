@@ -1,5 +1,14 @@
 #!/usr/bin/env ruby
 require_relative "../setup"
 
-require "pry"
-Pry.start
+repl = if ENV.has_key?("DYNO")
+  require 'irb'
+  IRB
+else
+  require "pry"
+  Pry
+end
+
+$r = DB.pool.checkout
+
+repl.start
