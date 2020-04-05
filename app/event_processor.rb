@@ -21,7 +21,11 @@ module EventProcessor
     account_id = event["account_id"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
-    person = Person.get(id: event["participant"]["user_id"], name: event["participant"]["user_name"])
+    person = Person.get(
+      id: event["participant"]["user_id"],
+      name: event["participant"]["user_name"],
+      timezone: event["timezone"]
+    )
 
     meeting << person
   end
