@@ -1,5 +1,7 @@
 require_relative "../test_helper"
 
+require "timecop"
+
 class PersonTest < Minitest::Test
   def setup
     @redis = DB.pool.checkout
@@ -65,10 +67,6 @@ class PersonTest < Minitest::Test
 
     @person.meeting_id = @meeting.id
 
-    assert_equal " 3:48 pm", @person.joined_at_time
-
-    @person.instance_variable_set(:"@timezone", 'America/New_York')
-
-    assert_equal " 6:48 pm", @person.joined_at_time
+    assert_includes @person.joined_at_time, "ago"
   end
 end

@@ -60,11 +60,7 @@ class Person
 
     time = Time.iso8601(time)
 
-    if @timezone && (tz = TZInfo::Timezone.get(@timezone))
-      time = tz.to_local(time)
-    end
-
-    time.strftime("%l:%M %P")
+    time.to_meaningful
   end
 
   def save

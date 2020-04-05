@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby '2.6.5'
+ruby '2.7.1'
 
 gem "dotenv"
 gem "puma"
@@ -11,5 +11,5 @@ gem "sinatra"
 gem "rake"
 gem "minitest"
 
-gem 'tzinfo'
-gem 'tzinfo-data'
+gem "meaningful_time"
+
