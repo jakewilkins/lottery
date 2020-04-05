@@ -21,10 +21,18 @@ module Zoom
     end
   end
 
-  def post(endpoint, body)
+  def post(endpoint, body, authorization: nil)
     uri = build_uri(endpoint)
     req = Net::HTTP::Post.new(uri, {'Content-Type': 'text/json'})
-    req["Authorization"] = "Bearer #{get_chatbot_token}"
+
+    authorization ||= "Bearer #{get_chatbot_token}"
+
+    if authorization == :basic
+      req.basic_auth(Settings.chatbot_client_id, Settings.chatbot_client_secret)
+    else
+      req["Authorization"] = authorization
+    end
+
     req.body = body.to_json
 
     res = send_request(uri, req)
@@ -59,6 +67,8 @@ module Zoom
       require "pry"; binding.pry
     end
   end
+
+  def
 
   def get_chatbot_token
     @chatbot_token_cache ||= {}
