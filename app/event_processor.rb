@@ -18,7 +18,7 @@ module EventProcessor
 
   def meeting_participant_joined(event)
     Settings.debug(event)
-    account_id = event["accountId"]
+    account_id = event["account_id"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
     person = Person.get(id: event["participant"]["user_id"], name: event["participant"]["user_name"])
@@ -28,7 +28,7 @@ module EventProcessor
 
   def meeting_participant_left(event)
     Settings.debug(event)
-    account_id = event["accountId"]
+    account_id = event["account_id"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
     return unless meeting.alive?
@@ -40,7 +40,7 @@ module EventProcessor
 
   def meeting_ended(event)
     Settings.debug(event)
-    account_id = event["accountId"]
+    account_id = event["account_id"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
     return unless meeting.alive?
