@@ -61,6 +61,15 @@ module Settings
     root_path.join("verifyzoom.html")
   end
 
+  def debug(message = nil, &block)
+    return unless debug?
+    if block
+      return block
+    elsif message
+      p message
+    end
+  end
+
   def debug?
     ENV.key?("DEBUG")
   end

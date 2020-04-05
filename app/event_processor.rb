@@ -17,6 +17,7 @@ module EventProcessor
   end
 
   def meeting_participant_joined(event)
+    Settings.debug(event)
     account_id = event["accountId"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
@@ -26,6 +27,7 @@ module EventProcessor
   end
 
   def meeting_participant_left(event)
+    Settings.debug(event)
     account_id = event["accountId"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
@@ -37,6 +39,7 @@ module EventProcessor
   end
 
   def meeting_ended(event)
+    Settings.debug(event)
     account_id = event["accountId"]
     event = event["object"]
     meeting = Meeting.find(event["id"], account: account_id)
