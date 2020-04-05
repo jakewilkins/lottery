@@ -11,3 +11,5 @@ gem "sinatra"
 gem "rake"
 gem "minitest"
 
+gem 'tzinfo'
+gem 'tzinfo-data'

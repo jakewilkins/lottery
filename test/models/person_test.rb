@@ -6,7 +6,7 @@ class PersonTest < Minitest::Test
     @meeting = Meeting.new(id: :test, account: :account)
     @meeting.cleanup
 
-    @person = Person.new(id: :foo, name: :bar)
+    @person = Person.new(id: :foo, name: :bar, timezone: "America/Los_Angeles")
   end
 
   def teardown
@@ -52,6 +52,13 @@ class PersonTest < Minitest::Test
     assert_equal time, person.joined_times[@meeting.id.to_s]
   end
 
+  def test_persists_timezone_info
+    assert_equal @person.timezone, "America/Los_Angeles"
+    @person.save
+    person = Person.find(id: @person.id)
+    assert_equal person.timezone, "America/Los_Angeles"
+  end
+
   def test_joined_at_time
     time = Time.iso8601("2020-04-04T15:48:32-07:00")
     @person.participating_in(meeting_id: @meeting.id, joined_at: time.iso8601)
@@ -59,5 +66,9 @@ class PersonTest < Minitest::Test
     @person.meeting_id = @meeting.id
 
     assert_equal " 3:48 pm", @person.joined_at_time
+
+    @person.instance_variable_set(:"@timezone", 'America/New_York')
+
+    assert_equal " 6:48 pm", @person.joined_at_time
   end
 end

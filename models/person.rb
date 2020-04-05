@@ -12,17 +12,18 @@ class Person
     new(id: id).tap {|e| e.hydrate}
   end
 
-  def self.get(id:, name:)
-    new(id: id, name: name)
+  def self.get(id:, name:, timezone:)
+    new(id: id, name: name, timezone: timezone)
   end
 
-  attr_reader :meeting_id, :id, :name
+  attr_reader :meeting_id, :id, :name, :timezone
   attr_writer :meeting_id
   attr_reader :joined_times
 
-  def initialize(id:, name: nil, meeting_id: nil)
+  def initialize(id:, name: nil, meeting_id: nil, timezone: nil)
     @meeting_id, @id, @name = meeting_id, id, name
     @joined_times = {}
+    @timezone = timezone
   end
 
   def participating_in(meeting_id:, joined_at: nil)
@@ -59,16 +60,24 @@ class Person
 
     time = Time.iso8601(time)
 
+    if @timezone && (tz = TZInfo::Timezone.get(@timezone))
+      time = tz.to_local(time)
+    end
+
     time.strftime("%l:%M %P")
   end
 
   def save
-    DB { |conn| conn.set(key, name) }
+    DB do |conn|
+      conn.mapped_hmset(key, {name: name, timezone: timezone})
+    end
   end
 
   def hydrate
     DB do |conn|
-      @name = conn.get(key)
+      hash = conn.hgetall(key)
+      @name = hash['name']
+      @timezone = hash['timezone']
       @joined_times = conn.hgetall(active_meetings_key)
     end
   end
