@@ -50,7 +50,7 @@ module InteractionProcessor
     winner = meeting.draw
 
     if winner.empty?
-      Response.empty_draw(meeting)
+      Response.empty_draw(meeting_id)
     else
       Response.winner(winner)
     end
