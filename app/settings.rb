@@ -31,6 +31,10 @@ module Settings
     ENV["ZOOM_CLIENT_SECRET"]
   end
 
+  def rollbar_access_token
+    ENV["ROLLBAR_ACCESS_TOKEN"]
+  end
+
   def root_path
     @root_path ||= Pathname.new(__FILE__).dirname.dirname
   end

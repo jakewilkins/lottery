@@ -25,4 +25,11 @@ require_relative "models/response"
 require_relative "models/person"
 
 
+require "rollbar"
+require "rollbar/middleware/sinatra"
+
+Rollbar.configure do |config|
+  config.access_token = Settings.rollbar_access_token
+end
+
 require_relative "app"

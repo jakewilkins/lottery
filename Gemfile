@@ -13,3 +13,5 @@ gem "minitest"
 
 gem "meaningful_time"
 
+gem "rollbar"
+

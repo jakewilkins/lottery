@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class App < Sinatra::Base
+  use Rollbar::Middleware::Sinatra
+
   get "/oauth" do
     redirect "https://zoom.us/launch/chat?jid=robot_#{Settings.zoom_bot_jid}"
   end

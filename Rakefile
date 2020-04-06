@@ -1,5 +1,14 @@
 # ?
 require "rake/testtask"
+require 'rollbar/rake_tasks'
+
+task :environment do
+  require_relative "setup"
+
+  Rollbar.configure do |config |
+    config.access_token = Settings.rollbar_access_token
+  end
+end
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
