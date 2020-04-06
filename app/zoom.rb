@@ -100,6 +100,8 @@ module Zoom
   end
 
   def build_uri(ep)
+    return ep if ep[0..3] == "http"
+
     ep = "/#{ep}" unless ep[0] == "/"
     URI("https://api.zoom.us/v2#{ep}")
   end
