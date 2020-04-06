@@ -68,8 +68,6 @@ module Zoom
     end
   end
 
-  def
-
   def get_chatbot_token
     @chatbot_token_cache ||= {}
 
