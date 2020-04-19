@@ -5,6 +5,7 @@ class App < Sinatra::Base
 
   get("/privacy") { redirect to("/privacy.html") }
   get("/terms") { redirect to("/terms.html") }
+  get("/support") { redirect to("https://github.com/jakewilkins/lottery/issues") }
 
   get "/oauth" do
     redirect "https://zoom.us/launch/chat?jid=robot_#{Settings.zoom_bot_jid}"
