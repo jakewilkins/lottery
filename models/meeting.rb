@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class Meeting
-  KEY_PATTERN = "meeting:%<account_id>s:%<id>s"
-  NAME_KEY_PATTERN = "#{KEY_PATTERN}:%<person>s"
+  KEY_PATTERN = "meeting:%<id>s"
   CALLED_KEY = "#{KEY_PATTERN}:called"
 
   attr_reader :id, :account_id
