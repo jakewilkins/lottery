@@ -3,6 +3,9 @@
 class App < Sinatra::Base
   use Rollbar::Middleware::Sinatra
 
+  get("/privacy") { redirect to("/privacy.html") }
+  get("/terms") { redirect to("/terms.html") }
+
   get "/oauth" do
     redirect "https://zoom.us/launch/chat?jid=robot_#{Settings.zoom_bot_jid}"
   end
