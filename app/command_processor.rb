@@ -13,16 +13,20 @@ module CommandProcessor
     return Response.blank unless COMMANDS.include?(command)
     Settings.log([command, args])
 
-    return drawn_response(args.first, account: event["accountId"]) if command == :draw
+    return drawn_response(args.first, event: event) if command == :draw
 
     Response.blank
   end
 
-  def drawn_response(meeting_id, account:)
+  def drawn_response(meeting_id, event:)
     id = meeting_id.gsub(/([[:punct:]]| )/, '')
+    account = event['accountId']
+    user_id = event['userId']
     meeting = Meeting.find(id, account: account)
+    person = Person.find(id: user_id)
 
     return Response.unknown_meeting_id(meeting_id) unless meeting.alive?
+    return Response.unknown_meeting_id(meeting_id) unless person.in?(meeting_id: meeting.id)
 
     winner = meeting.draw
 

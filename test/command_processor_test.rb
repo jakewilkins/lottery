@@ -19,21 +19,22 @@ class CommandProcessorTest < Minitest::Test
   end
 
   def test_draw_command
-    response = @subject.drawn_response("test", account: :account)
+    event = {'accountId' => 'account', 'userId' => 'foo'}
+    response = @subject.drawn_response("test", event: event)
     assert_equal :unknown_meeting_id, response.type
 
     @meeting << @person
 
-    response = @subject.drawn_response("test", account: :account)
+    response = @subject.drawn_response("test", event: event)
     assert_equal :winner, response.type
     assert_instance_of Person, response.context[:person]
 
     @meeting.shared(@person)
-    response = @subject.drawn_response("test", account: :account)
+    response = @subject.drawn_response("test", event: event)
     assert_equal :empty_draw, response.type
 
-
-    response = @subject.drawn_response("test", account: :other_account)
+    @meeting >> @person
+    response = @subject.drawn_response("test", event: event)
     assert_equal :unknown_meeting_id, response.type
   end
 end
