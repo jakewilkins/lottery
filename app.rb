@@ -74,6 +74,8 @@ class App < Sinatra::Base
     "ok"
   end
 
+  get("/") { redirect to("https://github.com/jakewilkins/lottery/issues") }
+
   def valid_request?
     request.env["HTTP_AUTHORIZATION"] == Settings.zoom_verification_token
   end
