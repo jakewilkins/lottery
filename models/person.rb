@@ -36,6 +36,12 @@ class Person
     end
   end
 
+  def in?(meeting_id:)
+    DB do |conn|
+      conn.hexists(active_meetings_key, meeting_id)
+    end
+  end
+
   def empty?
     id == :empty
   end
