@@ -1,3 +1,4 @@
+# This never got approved by zoom so it's useless?
 # Lottery
 
 Lottery share system for a Zoom meeting
